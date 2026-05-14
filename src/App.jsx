@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import './App.css'
 import TaskList from './components/TaskList';
+import { Button, Input, Panel, Textarea, Card, Tabs } from 'mosaic-ui-kit';
 
 function App() {
   const [tasks, setTasks] = useState(() => {
@@ -58,12 +59,17 @@ function App() {
   };
 
   const startEditing = (task) => {
-    setEditingTaskId(task.id);
+    if (task != null) {
+      setEditingTaskId(task.id);
 
-    setEditingTask({
-      title: task.title,
-      description: task.description,
-    });
+      setEditingTask({
+        title: task.title,
+        description: task.description,
+      });
+    }
+    else {
+      setEditingTaskId(null)
+    }
   };
 
   const saveEdit = () => {
@@ -99,74 +105,113 @@ function App() {
     return matchesFilter && matchesSearch;
   })
 
+  const activeCount = tasks.filter(task => !task.completed).length;
+  const completedCount = tasks.filter(task => task.completed).length;
+
   return (
-    <div>
-      <h1>Мои задачи</h1>
+    <div style={{
+      minHeight: '100vh',
+      padding: '48px 24px',
+    }}>
+      <Panel>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '24px',
+          maxWidth: '720px',
+          margin: '0 auto',
+        }}>
+          <h1
+            style={{
+              fontSize: '28px',
+              margin: 0,
+              letterSpacing: '1px',
+              color: 'white',
+            }}
+          >
+            TASK_MANAGER.EXE
+          </h1>
 
-      <input value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleAddTasks();
-          }
-        }}
-        placeholder='Введите задачу' />
+          <Card variant="primary">
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+            }}>
 
-      <input value={description}
-        onChange={(e) => setDescription(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") {
-            handleAddTasks();
-          }
-        }}
-        placeholder='Description...' />
+              <Input value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleAddTasks();
+                  }
+                }}
+                placeholder='Enter the task...' />
 
-      <button onClick={handleAddTasks}>Добавить</button>
+              <Textarea value={description}
+                rows={4}
+                onChange={(e) => setDescription(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleAddTasks();
+                  }
+                }}
+                placeholder='Description...' />
 
-      <></>
-      <input
-        type='text'
-        placeholder='Search...'
-        value={search}
-        onChange={(e) => setSearch(e.target.value)}
-      />
+              <Button onClick={handleAddTasks}>Add</Button>
+            </div>
+          </Card>
 
-      <div>
-        <button
-          onClick={() => setFilter("all")}
-          style={{
-            fontWeight: filter === "all" ? "bold" : "normal",
-          }}>
-          All
-        </button>
-        <button
-          onClick={() => setFilter("active")}
-          style={{
-            fontWeight: filter === "active" ? "bold" : "normal",
-          }}>
-          Active
-        </button>
-        <button
-          onClick={() => setFilter("completed")}
-          style={{
-            fontWeight: filter === "completed" ? "bold" : "normal",
-          }}>
-          Completed
-        </button>
-      </div>
+          <Card variant='primary'>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '12px',
+            }}>
+              <Input
+                type='text'
+                placeholder='Search...'
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+          </Card>
 
-      <TaskList
-        tasks={filteredTasks}
-        onDelete={handleDeleteTask}
-        onToggle={toggleTask}
-        onEdit={startEditing}
-        editingTaskId={editingTaskId}
-        editingTask={editingTask}
-        setEditingTask={setEditingTask}
-        onSave={saveEdit}
-        openedTaskId={openedTaskId}
-        setOpenedTaskId={setOpenedTaskId}
-      />
+          <Tabs
+            fullWidth
+            variant="accent"
+            items={[
+              {
+                label: `ALL (${tasks.length})`,
+                value: 'all',
+              },
+              {
+                label: `ACTIVE (${activeCount})`,
+                value: 'active',
+              },
+              {
+                label: `COMPLETED (${completedCount})`,
+                value: 'completed',
+              },
+            ]}
+            value={filter}
+            onChange={setFilter}
+          />
+
+          <TaskList
+            tasks={filteredTasks}
+            onDelete={handleDeleteTask}
+            onToggle={toggleTask}
+            onEdit={startEditing}
+            editingTaskId={editingTaskId}
+            editingTask={editingTask}
+            setEditingTask={setEditingTask}
+            onSave={saveEdit}
+            openedTaskId={openedTaskId}
+            setOpenedTaskId={setOpenedTaskId}
+          />
+        </div>
+      </Panel>
     </div>
   )
 }

@@ -1,61 +1,190 @@
+import { Input, Textarea, Checkbox, Button, Card, } from "mosaic-ui-kit";
+
 function TaskList({ tasks, onDelete, onToggle, onEdit, editingTaskId, editingTask, setEditingTask, onSave, openedTaskId, setOpenedTaskId }) {
     return (
-        <ul>
+        <ul style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '16px',
+            padding: 0,
+            margin: 0,
+            listStyle: 'none',
+        }}>
+            {tasks.length === 0 && (
+                <Card variant="accent">
+                    <div
+                        style={{
+                            textAlign: 'center',
+                            opacity: 0.7,
+                        }}
+                    >
+                        NO TASKS FOUND
+                    </div>
+                </Card>
+            )}
             {tasks.map((task) => (
-                <li key={task.id}>
-                    <input
-                        type='checkbox'
-                        checked={task.completed}
-                        onChange={() => onToggle(task.id)} />
-                    {editingTaskId === task.id ? (
-                        <>
-                            <input
-                                value={editingTask.title}
-                                onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
-                                placeholder="Title"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        onSave();
-                                    }
-                                }}
-                            />
+                <Card
+                    style={{
+                        opacity: task.completed ? 0.7 : 1,
+                    }}
+                    key={task.id}
+                    variant={
+                        task.completed
+                            ? 'secondary'
+                            : 'primary'
+                    }
+                >
+                    <div style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '10px',
+                    }}>
 
-                            <input
-                                value={editingTask.description}
-                                onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
-                                placeholder="Description"
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                        onSave();
-                                    }
-                                }}
-                            />
-                            <button onClick={onSave} title="Сохранить">💾</button>
-                        </>
-                    )
-                        : (
-                            <>
-                                <span style={{ textDecoration: task.completed ? "line-through" : "none" }}>
-                                    {task.title}
-                                </span>
-                                <button onClick={() => setOpenedTaskId(
-                                    openedTaskId === task.id ? null : task.id
-                                )}>
-                                    Подробнее
-                                </button>
+                        <div style={{
+                            display: 'flex',
+                            flexDirection: 'center',
+                            gap: '12px',
+                        }}>
+                            <Checkbox
+                                checked={task.completed}
+                                onChange={() => onToggle(task.id)} />
 
-                                {openedTaskId === task.id && (<p>
-                                    {task.description}
-                                </p>)}
+                            {editingTaskId === task.id ? (
+                                <>
+                                    <div style={{
+                                        display: 'flex',
+                                        flexDirection: 'column',
+                                        gap: '12px',
+                                        width: '100%',
+                                    }}>
+                                        <Input
+                                            value={editingTask.title}
+                                            onChange={(e) => setEditingTask({ ...editingTask, title: e.target.value })}
+                                            placeholder="Title"
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                    onSave();
+                                                }
+                                            }}
+                                        />
 
-                                <button onClick={() => onEdit(task)} title="Редактировать">✏️</button>
-                            </>
-                        )}
-                    <button onClick={() => onDelete(task.id)} title="Удалить">❌</button>
+                                        <Textarea
+                                            value={editingTask.description}
+                                            onChange={(e) => setEditingTask({ ...editingTask, description: e.target.value })}
+                                            placeholder="Description"
+                                            onKeyDown={(e) => {
+                                                if (e.key === "Enter") {
+                                                    onSave();
+                                                }
+                                            }}
+                                        />
+                                        <Button
+                                            size="small"
+                                            style={{
+                                                alignSelf: 'flex-start',
+                                            }}
+                                            variant="accent"
+                                            onClick={onSave}
+                                        >
+                                            Save
+                                        </Button>
+                                    </div>
+                                </>
+                            )
+                                : (
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            flexDirection: "row",
+                                            gap: '4px',
+                                        }}
+                                    >
+                                        <span
+                                            style={{
+                                                textDecoration:
+                                                    task.completed
+                                                        ? 'line-through'
+                                                        : 'none',
+                                                fontWeight: 600,
+                                                fontSize: '16px',
+                                            }}
+                                        >
+                                            {task.title}
+                                        </span>
 
-                </li>
-            ))}
-        </ul>
+                                        <span
+                                            style={{
+                                                opacity: 0.6,
+                                                fontSize: '12px',
+                                                letterSpacing: '1px',
+                                            }}
+                                        >
+                                            #{String(task.id).slice(-4)} • {
+                                                task.completed
+                                                    ? 'completed'
+                                                    : 'active'
+                                            }
+                                        </span>
+                                    </div>
+                                )}
+                        </div>
+
+
+                        {openedTaskId === task.id && (
+                            <p style={{
+                                overflowWrap: 'break-word',
+                                wordBreak: 'break-word',
+                                textAlign: 'start'
+                            }}>
+                                {task.description}
+                            </p>)}
+                        <div
+                            style={{
+                                display: 'flex',
+                                gap: '8px',
+                                flexWrap: 'wrap',
+                                marginTop: '8px',
+                                justifyContent: 'flex-end',
+                            }}
+                        >
+                            <Button
+                                size="small"
+                                variant={
+                                    openedTaskId === task.id
+                                        ? 'accent'
+                                        : 'secondary'
+                                }
+                                disabled={editingTaskId === task.id}
+                                onClick={() => {
+                                    onEdit(null);
+                                    setOpenedTaskId(openedTaskId === task.id ? null : task.id)
+                                }}>
+                                Details
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="secondary"
+                                disabled={editingTaskId === task.id}
+                                onClick={() => {
+                                    setOpenedTaskId(null);
+                                    onEdit(editingTaskId === task.id ? null : task)
+                                }}>
+                                Edit
+                            </Button>
+
+                            <Button
+                                size="small"
+                                variant="secondary"
+                                onClick={() => onDelete(task.id)}
+                            >
+                                Delete
+                            </Button>
+                        </div>
+                    </div>
+                </Card>
+            ))
+            }
+        </ul >
     )
 }
 
