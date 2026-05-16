@@ -5,6 +5,12 @@ Retro-inspired task manager built with React and mosaic-ui-kit.
 Preview
 ![Preview](./public/preview.png)
 
+🚀 Live Demo:
+https://task-manager-dusky-three.vercel.app
+
+🎨 UI Kit Storybook:
+https://mosaic-ui-kit.vercel.app/
+
 ## Features
 
 - Create tasks
